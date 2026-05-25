@@ -38,7 +38,7 @@ docker-compose down
 ## Architecture
 
 ### Backend — Layered DDD
-```
+```text
 src/
   routes/            → Express routers (candidateRoutes, positionRoutes)
   presentation/controllers/  → Parse req/res, delegate to services
@@ -68,3 +68,15 @@ PostgreSQL via Docker. Connection string is in `backend/prisma/schema.prisma` (h
 npx prisma migrate reset
 ts-node prisma/seed.ts
 ```
+
+## Prompt log — `prompts/prompts-iniciales.md`
+
+This file must be regenerated at the start and end of every session (and before any commit). Run from the repo root:
+
+```sh
+python3 ~/bin/list-prompts.py . \
+  | sed 's/[a-zA-Z0-9._%+-]\+@[a-zA-Z0-9.-]\+\.[a-zA-Z]\{2,\}/[email redacted]/g' \
+  > prompts/prompts-iniciales.md
+```
+
+The `sed` pass strips email addresses before the file is committed. Apply the same redaction to any other PII visible in prompt text (phone numbers, full names used as identifiers) before committing.

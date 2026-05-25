@@ -49,8 +49,13 @@ const mockCandidates = [
   },
 ];
 
-// Helper: simulate a drag from source card to destination column using mouse events.
-// react-beautiful-dnd uses pointer events — this helper covers the minimum required sequence.
+/**
+ * Simulates dragging a candidate card to a destination column.
+ * Uses low-level mouse events to trigger react-beautiful-dnd drag behavior.
+ *
+ * @param {string} candidateName - The full name of the candidate to drag.
+ * @param {string} destColumnTitle - The header title of the destination column.
+ */
 function dragCandidateToColumn(candidateName, destColumnTitle) {
   cy.contains('.card', candidateName).as('source');
   cy.contains('.card-header', destColumnTitle).closest('.col-md-3').as('dest');
@@ -61,12 +66,14 @@ function dragCandidateToColumn(candidateName, destColumnTitle) {
     const destY = destRect.top + destRect.height / 2;
 
     cy.get('@source')
-      .trigger('mousedown', { button: 0, force: true })
+      .trigger('mousedown', { button: 0 })
+      // force: true — coordinates land outside source bounds, bypassing the element boundary check
       .trigger('mousemove', { clientX: destX - 5, clientY: destY, force: true });
 
-    cy.get('body').trigger('mousemove', { clientX: destX, clientY: destY, force: true });
+    cy.get('body').trigger('mousemove', { clientX: destX, clientY: destY });
+    // force: true — the drag ghost rendered by react-beautiful-dnd may overlay the column during the move
     cy.get('@dest').trigger('mousemove', { clientX: destX, clientY: destY, force: true });
-    cy.get('body').trigger('mouseup', { clientX: destX, clientY: destY, force: true });
+    cy.get('body').trigger('mouseup', { clientX: destX, clientY: destY });
   });
 }
 
